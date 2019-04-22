@@ -115,9 +115,10 @@ server.post("/api/users", (req, res) => {
       console.log("New User:", user);
       res.status(201).json(user);
     })
-    .catch(error => {
+    .catch(err => {
       res.status(500).json({
-        error: "There was an error while saving the user to the database"
+        error: err,
+        message: "There was an error while saving the user to the database"
       });
     });
 });
@@ -169,10 +170,11 @@ server.put("/api/users/:id", (req, res) => {
     .then(updated => {
       res.status(201).json(updated);
     })
-    .catch(error => {
-      res
-        .status(500)
-        .json({ error: "The user information could not be modified." });
+    .catch(err => {
+      res.status(500).json({
+        error: err,
+        message: "The user information could not be modified."
+      });
     });
 });
 
@@ -191,7 +193,8 @@ server.put("/api/users/:id", (req, res) => {
 // return the following JSON object: { error: "The user could not be removed" }.
 
 server.delete("/api/users/:id", (req, res) => {
-  const id = req.params.id;
+  // axios.delete(.../users/${id})  ----- front end
+  const id = req.params.id; // req.params has the URL parameters
 
   db.remove(id)
     .then(user => {
@@ -204,8 +207,10 @@ server.delete("/api/users/:id", (req, res) => {
           .json({ message: "The user with the specified ID does not exist." });
       }
     })
-    .catch(error => {
-      res.status(500).json({ error: "The user could not be removed" });
+    .catch(err => {
+      res
+        .status(500)
+        .json({ error: err, message: "The user could not be removed" });
     });
 });
 
