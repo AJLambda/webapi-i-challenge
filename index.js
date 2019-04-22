@@ -1,17 +1,27 @@
 // implement your API here
+
+//import express from 'express'; // ES2015 Module Import
+const express = require("express"); // define the server; // CommonJS Module Import
+
 const db = require("./data/db.js"); // import the db functions;
 
-const express = require("express"); // define the server;
-const server = express(); // instantiate the server;
-const port = "4000";
-
+const server = express(); // instantiate the server; return back the server
 //parses body and add it to req object
 const parser = express.json();
-server.use(parser);
+server.use(parser); // server now knows how to write JSON. Extends express by using middleware
+
+const port = "4000";
+
+server.get("/", (req, res) => {
+  //request and response are positional arguments.
+  res.send("It's alive!"); // .send is a method of the response object. This sends a quick response back to the client
+});
 
 ////////////// GET REQUEST //////////////////
 
 // GET ALL USERS
+
+//Returns an array of all the user objects contained in the database.
 
 // When the client makes a GET request to /api/users:
 // If there's an error in retrieving the users from the database:
@@ -21,14 +31,12 @@ server.use(parser);
 // return the following JSON object: { error: "The users information could not be retrieved." }.
 
 server.get("/api/users", (req, res) => {
-  console.log("Users " + db.find());
-
   db.find()
-    .then(user => {
-      console.log("User: ", user);
-      res.json(user);
+    .then(users => {
+      console.log("All Users:", users);
+      res.json(users);
     })
-    .catch(error => {
+    .catch(err => {
       res
         .status(500)
         .json({ error: "The users information could not be retrieved." });
@@ -89,7 +97,10 @@ server.get("/api/users/:id", (req, res) => {
 // return the following JSON object: { error: "There was an error while saving the user to the database" }.
 
 server.post("/api/users", (req, res) => {
+  // one way to get data from the client is in the request's body
+  // axios.post(url, data) => the data shows up as the body on the server
   const user = req.body;
+  console.log("request body:", user);
 
   if (user.name && user.bio) {
     res.status(201).json(user);
@@ -122,7 +133,7 @@ server.post("/api/users", (req, res) => {
 // return the following JSON object: { message: "The user with the specified ID does not exist." }.
 // If the request body is missing the name or bio property:
 
-// cancel the request.
+// cancel the request. (cancel meaning do continue to the next step, which is making a call to the database)
 // respond with HTTP status code 400 (Bad Request).
 // return the following JSON response: { errorMessage: "Please provide name and bio for the user." }.
 // If there's an error when updating the user:
@@ -198,4 +209,13 @@ server.delete("/api/users/:id", (req, res) => {
     });
 });
 
-server.listen(port, () => console.log(`server listening on port: ${port}`));
+server.listen(port, () =>
+  console.log(`\n server listening on port: ${port} \n`)
+);
+
+/*
+
+1. install express with "yarn add express" or "npm i express"
+2. run it with "yarn server"
+
+*/
